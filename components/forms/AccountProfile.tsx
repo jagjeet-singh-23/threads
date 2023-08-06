@@ -2,7 +2,7 @@
 
 import * as z from "zod";
 import Image from "next/image";
-import { ChangeEvent } from "react";
+import { ChangeEvent, use } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -35,10 +35,10 @@ const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
   const form = useForm({
     resolver: zodResolver(UserValidation),
     defaultValues: {
-      profile_photo: "",
-      name: "",
-      username: "",
-      bio: "",
+      profile_photo: user?.image || "",
+      name: user?.name || "",
+      username: user?.username || "",
+      bio: user?.bio || "",
     },
   });
 
