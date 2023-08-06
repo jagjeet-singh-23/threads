@@ -2,7 +2,7 @@
 
 import * as z from "zod";
 import Image from "next/image";
-import { ChangeEvent, use } from "react";
+import { ChangeEvent, use, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -18,6 +18,7 @@ import { Input } from "../ui/input";
 import { UserValidation } from "@/lib/validations/user";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
+import { isBase64Image } from "@/lib/utils";
 
 interface AccountProfileProps {
   user: {
@@ -32,6 +33,7 @@ interface AccountProfileProps {
 }
 
 const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
+  const [files, setFiles] = useState<File[]>([]);
   const form = useForm({
     resolver: zodResolver(UserValidation),
     defaultValues: {
@@ -43,14 +45,29 @@ const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
   });
 
   const handleImage = (
-    e: ChangeEvent,
+    e: ChangeEvent<HTMLInputElement>,
     fieldChange: (value: string) => void
   ) => {
     e.preventDefault();
+    const fileReader = new FileReader();
+
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setFiles(Array.from(e.target.files));
+      if (!file.type.includes("image")) {
+        return;
+      }
+      fileReader.onload = async (event) => {
+        const imageDataUrl = event.target?.result?.toString() || "";
+        fieldChange(imageDataUrl);
+      };
+      fileReader.readAsDataURL(file);
+    }
   };
 
   function onSubmit(values: z.infer<typeof UserValidation>) {
-    console.log(values);
+    const blob = values.profile_photo;
+    const hasImageChanges = isBase64Image(blob);
   }
 
   return (
