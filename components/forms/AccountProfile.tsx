@@ -2,9 +2,10 @@
 
 import * as z from "zod";
 import Image from "next/image";
-import { ChangeEvent, use, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { usePathname, useRouter } from "next/navigation";
 
 import {
   Form,
@@ -19,7 +20,8 @@ import { UserValidation } from "@/lib/validations/user";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { isBase64Image } from "@/lib/utils";
-import {useUploadThing} from "@/lib/uploadthing"
+import { useUploadThing } from "@/lib/uploadthing";
+import { updateUser } from "@/lib/actions/user.action";
 
 interface AccountProfileProps {
   user: {
@@ -34,7 +36,10 @@ interface AccountProfileProps {
 }
 
 const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
+  const pathname = usePathname();
+  const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
+  const { startUpload } = useUploadThing("media");
   const form = useForm({
     resolver: zodResolver(UserValidation),
     defaultValues: {
@@ -66,14 +71,27 @@ const AccountProfile = ({ user, btnTitle }: AccountProfileProps) => {
     }
   };
 
-  function onSubmit(values: z.infer<typeof UserValidation>) {
+  const onSubmit = async (values: z.infer<typeof UserValidation>) => {
     const blob = values.profile_photo;
     const hasImageChanged = isBase64Image(blob);
 
-    if(hasImageChanged) { 
-      const imgRes = 
+    if (hasImageChanged) {
+      const imgRes = await startUpload(files);
+
+      if (imgRes && imgRes[0].fileUrl) {
+        values.profile_photo = imgRes[0].fileUrl;
+      }
     }
-  }
+
+    await updateUser(
+      values.username,
+      values.name,
+      values.bio,
+      values.profile_photo,
+      user.id,
+      pathname
+    );
+  };
 
   return (
     <Form {...form}>
