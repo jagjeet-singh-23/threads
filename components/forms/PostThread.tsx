@@ -16,40 +16,36 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
-// import { updateUser } from "@/lib/actions/user.action";
 import { ThreadValidation } from "@/lib/validations/thread";
+import { createThread } from "@/lib/actions/thread.actions";
 
 interface Props {
-  user: {
-    id: string;
-    objectId: string;
-    username: string;
-    name: string;
-    bio: string;
-    image: string;
-  };
-  btnTitle: string;
-}
-
-interface PostThreadProps {
   userId: string;
 }
 
-const PostThread = ({ userId }: PostThreadProps) => {
+function PostThread({ userId }: Props) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof ThreadValidation>>({
     resolver: zodResolver(ThreadValidation),
     defaultValues: {
-      threads: "",
+      thread: "",
       accountId: userId,
     },
   });
 
-  const onSubmit = async () => {
-    // await createThread();
+  const onSubmit = async (values: z.infer<typeof ThreadValidation>) => {
+    await createThread({
+      text: values.thread,
+      author: userId,
+      communityId: null,
+      path: pathname,
+    });
+
+    router.push("/");
   };
+
   return (
     <Form {...form}>
       <form
@@ -58,7 +54,7 @@ const PostThread = ({ userId }: PostThreadProps) => {
       >
         <FormField
           control={form.control}
-          name="threads"
+          name="thread"
           render={({ field }) => (
             <FormItem className="flex w-full flex-col gap-3">
               <FormLabel className="text-base-semibold text-light-2">
@@ -71,12 +67,13 @@ const PostThread = ({ userId }: PostThreadProps) => {
             </FormItem>
           )}
         />
+
         <Button type="submit" className="bg-primary-500">
           Post Thread
         </Button>
       </form>
     </Form>
   );
-};
+}
 
 export default PostThread;
