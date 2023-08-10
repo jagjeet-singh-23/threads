@@ -20,7 +20,6 @@ export async function createThread({
 }: Params) {
   try {
     connectToDB();
-
     const createdThread = await Thread.create({
       text,
       author,
@@ -34,4 +33,30 @@ export async function createThread({
   } catch (error: any) {
     throw new Error(`Error creating Thread: ${error.message}`);
   }
+}
+
+export async function fetchThreads(pageNumber = 1, pageSize = 20) {
+  connectToDB();
+  const skipAmount = (pageNumber - 1) * pageSize;
+  // Fetch the posts that have no parents (top-level threads...)
+  const fetchQuery = Thread.find({ parentId: { $in: [null, undefined] } })
+    .sort({ createThread: "desc" })
+    .skip(skipAmount)
+    .limit(pageSize)
+    .populate({ path: "author", model: User })
+    .populate({
+      path: "children",
+      populate: {
+        path: "author",
+        model: User,
+        select: "_id name parentId image",
+      },
+    });
+
+  const totalPageCount = await Thread.countDocuments({
+    parentId: { $in: [null, undefined] },
+  });
+  const posts = await fetchQuery.exec();
+  const isNext = totalPageCount > skipAmount * pageSize;
+  return { posts, isNext };
 }
