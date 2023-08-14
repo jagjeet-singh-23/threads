@@ -72,7 +72,7 @@ export async function fetchUserPosts(userId: string) {
         populate: {
           path: "author",
           model: User,
-          select: "name id image",
+          select: "name image id",
         },
       },
     });

@@ -13,12 +13,12 @@ const ThreadsTab = async ({
   accountId,
   accountType,
 }: ThreadsTabProps) => {
-  //   TODO: fetch profile threads
   let result = await fetchUserPosts(accountId);
 
   if (!result) {
     redirect("/");
   }
+
   return (
     <section className="mt-9 flex flex-col gap-10">
       {result.threads.map((thread: any) => (
@@ -36,8 +36,8 @@ const ThreadsTab = async ({
                   image: thread.author.image,
                   id: thread.author.id,
                 }
-          } 
-          community={thread.community} //todo
+          }
+          community={thread.community}
           createdAt={thread.createdAt}
           comments={thread.children}
         />
