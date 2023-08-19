@@ -22,8 +22,7 @@ async function Home({
     searchParams.page ? +searchParams.page : 1,
     30
   );
-    console.log(result.posts[result.posts.length - 1]);
-    
+
   return (
     <>
       <h1 className="head-text text-left">Home</h1>
