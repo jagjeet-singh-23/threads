@@ -135,7 +135,7 @@ export async function fetchCommunities({
     }
 
     // Define the sort options for the fetched communities based on createdAt field and provided sort order.
-    const sortOptions = { createdAt: sortBy };
+    const sortOptions = { createAt: sortBy };
 
     // Create a query to fetch the communities based on the search and sort criteria.
     const communitiesQuery = Community.find(query)
