@@ -16,7 +16,7 @@ export async function fetchThreads(pageNumber = 1, pageSize = 20) {
 
   // Create a query to fetch the posts that have no parent (top-level threads) (a thread that is not a comment/reply).
   const postsQuery = Thread.find({ parentId: { $in: [null, undefined] } })
-    .sort({ createdAt: "desc" })
+    .sort({ createAt: "desc" })
     .skip(skipAmount)
     .limit(pageSize)
     .populate({
