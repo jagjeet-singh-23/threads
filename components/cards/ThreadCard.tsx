@@ -107,8 +107,6 @@ const ThreadCard = ({
         </div>
         {/* TODO: DeleteThread */}
         {/* TODO: Show comment logos */}
-        {/* {console.log(community)} */}
-        {/* {console.log(createdAt)} */}
         
         {!isComment && community && (
           <Link
