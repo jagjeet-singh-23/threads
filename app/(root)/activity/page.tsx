@@ -3,7 +3,6 @@ import { currentUser } from "@clerk/nextjs";
 import {
   fetchNotifications,
   fetchUser,
-  fetchUsers,
 } from "@/lib/actions/user.action";
 import Image from "next/image";
 import Link from "next/link";
